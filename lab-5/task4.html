@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Каталог продуктів</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    input, button { margin: 5px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 5px; text-align: center; }
+  </style>
+</head>
+<body>
+
+<h2>Каталог продуктів</h2>
+
+<input type="text" id="productName" placeholder="Назва продукту">
+<input type="number" id="productPrice" placeholder="Ціна">
+<input type="number" id="productQty" placeholder="Кількість">
+<button onclick="addProduct()">Додати</button>
+
+<h3>Список продуктів:</h3>
+<div id="productList"></div>
+
+<h3>Пошук продукту</h3>
+<input type="text" id="searchName" placeholder="Назва продукту">
+<button onclick="searchProduct()">Знайти</button>
+<div id="searchResult"></div>
+
+<script>
+  // === Структури даних ===
+  const productCatalog = new Map(); // Map: id -> {name, price, qty}
+  const productNames = new Set(); // Set: імена унікальні
+  const productHistory = new WeakMap(); // WeakMap: productObj -> історія змін
+  const userLinks = new WeakSet(); // WeakSet: об'єкти користувачів (імітація)
+
+  let idCounter = 1;
+
+  function addProduct() {
+    const name = document.getElementById('productName').value.trim();
+    const price = +document.getElementById('productPrice').value;
+    const qty = +document.getElementById('productQty').value;
+
+    if (!name || price <= 0 || qty <= 0) return alert("Некоректні дані");
+
+    if (productNames.has(name)) return alert("Такий продукт вже існує!");
+
+    const product = { name, price, qty };
+    productCatalog.set(idCounter, product);
+    productNames.add(name);
+    productHistory.set(product, [`Додано: ${new Date().toLocaleString()}`]);
+
+    idCounter++;
+    updateProductList();
+  }
+
+  function updateProductList() {
+    let html = `<table>
+      <tr><th>ID</th><th>Назва</th><th>Ціна</th><th>Кількість</th><th>Дії</th></tr>`;
+    for (let [id, product] of productCatalog.entries()) {
+      html += `<tr>
+        <td>${id}</td>
+        <td>${product.name}</td>
+        <td>${product.price}</td>
+        <td>${product.qty}</td>
+        <td>
+          <button onclick="updateProduct(${id})">Оновити</button>
+          <button onclick="deleteProduct(${id})">Видалити</button>
+          <button onclick="orderProduct(${id})">Замовити</button>
+        </td>
+      </tr>`;
+    }
+    html += '</table>';
+    document.getElementById('productList').innerHTML = html;
+  }
+
+  function deleteProduct(id) {
+    const product = productCatalog.get(id);
+    productCatalog.delete(id);
+    productNames.delete(product.name);
+    document.getElementById('searchResult').textContent = '';
+    updateProductList();
+  }
+
+  function updateProduct(id) {
+    const newPrice = +prompt("Нова ціна:");
+    const newQty = +prompt("Нова кількість:");
+    if (newPrice <= 0 || newQty < 0) return alert("Некоректно");
+
+    const product = productCatalog.get(id);
+    product.price = newPrice;
+    product.qty = newQty;
+
+    const history = productHistory.get(product);
+    history.push(`Оновлено: ${new Date().toLocaleString()}`);
+    updateProductList();
+  }
+
+  function orderProduct(id) {
+    const product = productCatalog.get(id);
+    if (product.qty === 0) return alert("Немає в наявності");
+    product.qty--;
+
+    const history = productHistory.get(product);
+    history.push(`Замовлено: ${new Date().toLocaleString()}`);
+    updateProductList();
+  }
+
+  function searchProduct() {
+    const name = document.getElementById('searchName').value.trim();
+    for (let [id, product] of productCatalog.entries()) {
+      if (product.name.toLowerCase() === name.toLowerCase()) {
+        const history = productHistory.get(product) || [];
+        document.getElementById('searchResult').innerHTML =
+          `<b>Продукт:</b> ${product.name}<br>
+          <b>Ціна:</b> ${product.price}<br>
+          <b>Кількість:</b> ${product.qty}<br>
+          <b>Історія:</b><br>${history.join('<br>')}`;
+        return;
+      }
+    }
+    document.getElementById('searchResult').textContent = "Продукт не знайдено";
+  }
+
+  // === Імітація користувачів для WeakSet ===
+  const user1 = { name: "Іван" };
+  const user2 = { name: "Оля" };
+  userLinks.add(user1);
+  userLinks.add(user2);
+  console.log("Користувачі в системі:", userLinks.has(user1), userLinks.has(user2));
+</script>
+
+</body>
+</html>

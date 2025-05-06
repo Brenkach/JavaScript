@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Лампочка</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    .lamp {
+      width: 100px;
+      height: 100px;
+      background-color: gray;
+      border-radius: 50%;
+      margin: 20px auto;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+    .on {
+      background-color: yellow;
+      box-shadow: 0 0 30px yellow;
+    }
+    .led.on {
+      background-color: lightgreen;
+      box-shadow: 0 0 30px lightgreen;
+    }
+    .eco.on {
+      background-color: lightblue;
+      box-shadow: 0 0 30px lightblue;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Лампочка</h2>
+<div id="lamp" class="lamp"></div>
+
+<select id="lampType">
+  <option value="normal">Звичайна</option>
+  <option value="eco">Енергозберігаюча</option>
+  <option value="led">Світлодіодна</option>
+</select>
+
+<br><br>
+
+<button id="toggleBtn">Увімкнути/Вимкнути</button>
+<button id="brightnessBtn">Змінити яскравість</button>
+
+<script>
+  const lamp = document.getElementById('lamp');
+  const toggleBtn = document.getElementById('toggleBtn');
+  const lampType = document.getElementById('lampType');
+  const brightnessBtn = document.getElementById('brightnessBtn');
+
+  let isOn = false;
+  let inactivityTimer;
+
+  function updateLampClass() {
+    lamp.className = 'lamp'; // скидаємо всі класи
+    const type = lampType.value;
+    if (isOn) {
+      lamp.classList.add('on');
+      if (type === 'led') lamp.classList.add('led');
+      if (type === 'eco') lamp.classList.add('eco');
+    } else {
+      // не додаємо клас 'on'
+      if (type === 'led') lamp.classList.add('led');
+      if (type === 'eco') lamp.classList.add('eco');
+    }
+  }
+
+  function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+      isOn = false;
+      updateLampClass();
+      alert('Лампочка автоматично вимкнена через 5 хвилин бездіяльності.');
+    }, 5 * 60 * 1000); // 5 хв
+  }
+
+  toggleBtn.addEventListener('click', () => {
+    isOn = !isOn;
+    updateLampClass();
+    resetInactivityTimer();
+  });
+
+  lampType.addEventListener('change', () => {
+    updateLampClass();
+    resetInactivityTimer();
+  });
+
+  brightnessBtn.addEventListener('click', () => {
+    const brightness = prompt('Введіть яскравість (1-100):');
+    if (brightness !== null) {
+      const val = Math.max(1, Math.min(100, parseInt(brightness)));
+      lamp.style.boxShadow = isOn ? `0 0 ${val}px ${lamp.style.backgroundColor || 'yellow'}` : 'none';
+    }
+    resetInactivityTimer();
+  });
+
+  resetInactivityTimer();
+</script>
+
+</body>
+</html>

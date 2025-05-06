@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Дата та час</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .clock {
+      font-size: 2em;
+      margin-bottom: 20px;
+    }
+
+    .blink {
+      opacity: 1;
+      animation: blink 1s infinite;
+    }
+
+    @keyframes blink {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    table {
+      margin: 0 auto;
+      border-collapse: collapse;
+    }
+
+    td, th {
+      border: 1px solid #aaa;
+      padding: 5px 10px;
+    }
+
+    select, input[type="date"], button {
+      margin: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Цифровий годинник</h2>
+<div id="clock" class="clock">00<span class="blink">:</span>00:00</div>
+
+<h2>Таймер зворотного відліку</h2>
+<input type="datetime-local" id="countdownInput">
+<button onclick="startCountdown()">Старт</button>
+<div id="countdownResult"></div>
+
+<h2>Календар</h2>
+<select id="month"></select>
+<input type="number" id="year" min="1900" max="2100" value="">
+<div id="calendar"></div>
+
+<h2>День народження</h2>
+<input type="date" id="birthday">
+<button onclick="checkBirthday()">Порахувати</button>
+<div id="birthdayResult"></div>
+
+<script>
+  // === 1. Годинник ===
+  function updateClock() {
+    const now = new Date();
+    const sec = String(now.getSeconds()).padStart(2, '0');
+    const min = String(now.getMinutes()).padStart(2, '0');
+    const hr = String(now.getHours()).padStart(2, '0');
+    document.getElementById('clock').innerHTML = `${hr}<span class="blink">:</span>${min}:${sec}`;
+  }
+  setInterval(updateClock, 1000);
+  updateClock();
+
+  // === 2. Таймер зворотного відліку ===
+  let countdownInterval;
+  function startCountdown() {
+    clearInterval(countdownInterval);
+    const input = document.getElementById('countdownInput').value;
+    const target = new Date(input);
+    countdownInterval = setInterval(() => {
+      const now = new Date();
+      const diff = target - now;
+      if (diff <= 0) {
+        clearInterval(countdownInterval);
+        document.getElementById('countdownResult').textContent = 'Час вийшов!';
+        return;
+      }
+      const seconds = Math.floor(diff / 1000) % 60;
+      const minutes = Math.floor(diff / (1000 * 60)) % 60;
+      const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      document.getElementById('countdownResult').textContent =
+        `${days} дн, ${hours} год, ${minutes} хв, ${seconds} сек`;
+    }, 1000);
+  }
+
+  // === 3. Календар ===
+  const months = ['Січень', 'Лютий', 'Березень', 'Квітень', 'Травень', 'Червень',
+                  'Липень', 'Серпень', 'Вересень', 'Жовтень', 'Листопад', 'Грудень'];
+  const monthSelect = document.getElementById('month');
+  const yearInput = document.getElementById('year');
+
+  months.forEach((m, i) => {
+    const option = document.createElement('option');
+    option.value = i;
+    option.textContent = m;
+    monthSelect.appendChild(option);
+  });
+
+  const now = new Date();
+  monthSelect.value = now.getMonth();
+  yearInput.value = now.getFullYear();
+
+  function generateCalendar(month, year) {
+    const firstDay = new Date(year, month, 1).getDay();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    let table = '<table><tr>';
+    const weekdays = ['Нд','Пн','Вт','Ср','Чт','Пт','Сб'];
+    weekdays.forEach(d => table += `<th>${d}</th>`);
+    table += '</tr><tr>';
+
+    let day = 1;
+    let startDay = (firstDay + 6) % 7; // понеділок — початок
+    for (let i = 0; i < startDay; i++) table += '<td></td>';
+
+    for (let i = startDay; i < 7; i++) {
+      table += `<td>${day++}</td>`;
+    }
+    table += '</tr>';
+
+    while (day <= daysInMonth) {
+      table += '<tr>';
+      for (let i = 0; i < 7; i++) {
+        table += day <= daysInMonth ? `<td>${day++}</td>` : '<td></td>';
+      }
+      table += '</tr>';
+    }
+
+    table += '</table>';
+    document.getElementById('calendar').innerHTML = table;
+  }
+
+  monthSelect.addEventListener('change', () => {
+    generateCalendar(+monthSelect.value, +yearInput.value);
+  });
+  yearInput.addEventListener('input', () => {
+    generateCalendar(+monthSelect.value, +yearInput.value);
+  });
+
+  generateCalendar(+monthSelect.value, +yearInput.value);
+
+  // === 4. День народження ===
+  function checkBirthday() {
+    const bdate = new Date(document.getElementById('birthday').value);
+    const now = new Date();
+    const next = new Date(now.getFullYear(), bdate.getMonth(), bdate.getDate());
+    if (next < now) next.setFullYear(now.getFullYear() + 1);
+    const diff = next - now;
+    const seconds = Math.floor(diff / 1000) % 60;
+    const minutes = Math.floor(diff / (1000 * 60)) % 60;
+    const hours = Math.floor(diff / (1000 * 60 * 60)) % 24;
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const months = Math.floor(days / 30);
+    document.getElementById('birthdayResult').textContent =
+      `До дня народження: ${months} міс, ${days % 30} дн, ${hours} год, ${minutes} хв, ${seconds} сек`;
+  }
+</script>
+
+</body>
+</html>

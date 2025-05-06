@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <title>Світлофор</title>
+  <style>
+    .traffic-light {
+      width: 100px;
+      background: #333;
+      border-radius: 10px;
+      padding: 10px;
+      margin: 20px auto;
+    }
+    .light {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #444;
+      margin: 10px auto;
+      transition: background 0.5s;
+    }
+    .red.on { background: red; }
+    .yellow.on { background: yellow; }
+    .green.on { background: green; }
+
+    button {
+      display: block;
+      margin: 10px auto;
+    }
+    .state-text {
+      text-align: center;
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<h2 style="text-align:center;">Світлофор</h2>
+
+<div class="traffic-light">
+  <div id="red" class="light red"></div>
+  <div id="yellow" class="light yellow"></div>
+  <div id="green" class="light green"></div>
+</div>
+
+<div class="state-text" id="stateText">Стан: -</div>
+
+<button id="changeTimeBtn">Змінити тривалість</button>
+<button id="nextBtn">Наступний стан</button>
+
+<script>
+  const red = document.getElementById('red');
+  const yellow = document.getElementById('yellow');
+  const green = document.getElementById('green');
+  const stateText = document.getElementById('stateText');
+
+  let redTime = 5000;
+  let yellowTime = 3000;
+  let greenTime = 7000;
+  let current = 0;
+  let interval;
+  let blinking = 0;
+
+  const states = [
+    { name: 'Червоний', light: red, duration: () => redTime },
+    { name: 'Жовтий', light: yellow, duration: () => yellowTime },
+    { name: 'Зелений', light: green, duration: () => greenTime },
+    { name: 'Миготливий жовтий', light: yellow, duration: () => 1000 } // лише для миготіння
+  ];
+
+  function clearLights() {
+    [red, yellow, green].forEach(el => el.classList.remove('on'));
+  }
+
+  function showStateText(text) {
+    stateText.textContent = `Стан: ${text}`;
+  }
+
+  function startCycle() {
+    clearInterval(interval);
+    runState(current);
+  }
+
+  function runState(index) {
+    clearLights();
+    let state = states[index];
+    if (state.name === 'Миготливий жовтий') {
+      blinking = 0;
+      blinkYellow();
+      return;
+    }
+
+    state.light.classList.add('on');
+    showStateText(state.name);
+    current = (index + 1) % states.length;
+    interval = setTimeout(() => runState(current), state.duration());
+  }
+
+  function blinkYellow() {
+    if (blinking >= 6) {
+      current = 0; // повертаємось до червоного
+      runState(current);
+      return;
+    }
+    yellow.classList.toggle('on');
+    showStateText('Миготливий жовтий');
+    blinking++;
+    interval = setTimeout(blinkYellow, 500);
+  }
+
+  document.getElementById('changeTimeBtn').addEventListener('click', () => {
+    let redInput = parseInt(prompt("Тривалість червоного (сек):", redTime / 1000));
+    let yellowInput = parseInt(prompt("Тривалість жовтого (сек):", yellowTime / 1000));
+    let greenInput = parseInt(prompt("Тривалість зеленого (сек):", greenTime / 1000));
+
+    if (!isNaN(redInput)) redTime = redInput * 1000;
+    if (!isNaN(yellowInput)) yellowTime = yellowInput * 1000;
+    if (!isNaN(greenInput)) greenTime = greenInput * 1000;
+
+    alert('Час оновлено!');
+  });
+
+  document.getElementById('nextBtn').addEventListener('click', () => {
+    clearTimeout(interval);
+    current = (current + 1) % states.length;
+    runState(current);
+  });
+
+  startCycle();
+</script>
+
+</body>
+</html>
