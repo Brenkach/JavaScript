@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Список товарів</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <h1>Список товарів</h1>
+    <div id="total-price">Загальна вартість: 0 ₴</div>
+  </header>
+
+  <aside id="filters">
+    <!-- Кнопки фільтрації додадуться динамічно -->
+  </aside>
+
+  <section id="sorters">
+    <button data-sort="price">Сортувати за ціною</button>
+    <button data-sort="created">Сортувати за датою створення</button>
+    <button data-sort="updated">Сортувати за датою оновлення</button>
+    <button id="reset-sorting">Скинути сортування</button>
+  </section>
+
+  <main>
+    <div id="empty-msg">Наразі список товарів пустий. Додайте новий товар.</div>
+    <div id="product-list" class="product-list"></div>
+    <button id="add-product-btn">Додати новий товар</button>
+  </main>
+
+  <div id="modal" class="hidden"></div>
+  <div id="toast-container"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
