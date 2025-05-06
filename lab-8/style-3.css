@@ -1,0 +1,56 @@
+/* Загальні стилі */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+  }
+  
+  .kanban-container {
+    display: flex;
+    justify-content: space-around;
+    margin: 20px;
+  }
+  
+  .kanban-column {
+    width: 30%;
+    min-height: 300px;
+    background-color: #e2e2e2;
+    border-radius: 8px;
+    padding: 10px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .kanban-column h2 {
+    text-align: center;
+    margin-bottom: 10px;
+    font-size: 24px;
+  }
+  
+  .task {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin: 5px;
+    border-radius: 5px;
+    cursor: move;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Стилі при переміщенні елементів */
+  .task:active {
+    opacity: 0.7;
+  }
+  
+  /* Стилі для області для скидання */
+  .kanban-column.drag-over {
+    background-color: #d1ffd1;
+    border: 2px dashed #4caf50;
+  }
+  

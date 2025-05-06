@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kanban Board</title>
+  <link rel="stylesheet" href="style-3.css">
+</head>
+<body>
+
+  <div class="kanban-container">
+    <!-- Колонки Kanban -->
+    <div class="kanban-column" id="todo" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <h2>To Do</h2>
+      <div id="task1" class="task" draggable="true" ondragstart="drag(event)">Завдання 1</div>
+      <div id="task2" class="task" draggable="true" ondragstart="drag(event)">Завдання 2</div>
+      <div id="task3" class="task" draggable="true" ondragstart="drag(event)">Завдання 3</div>
+    </div>
+
+    <div class="kanban-column" id="in-progress" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <h2>In Progress</h2>
+    </div>
+
+    <div class="kanban-column" id="done" ondrop="drop(event)" ondragover="allowDrop(event)">
+      <h2>Done</h2>
+    </div>
+  </div>
+
+  <script src="script-3.js"></script>
+</body>
+</html>
